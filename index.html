@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Resultatenketen Digitale interactie — interactief</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;background:#EEF2F6;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#15325C}
+.top{max-width:1920px;margin:0 auto;padding:20px 24px 12px;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 32px}
+.top h1{margin:0;font-size:28px;line-height:34px;font-weight:400}
+.top .kick{font-size:13px;font-weight:700;letter-spacing:.14em;color:#5A6B80;margin-bottom:4px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:#3D4A5C;align-items:center}
+.legend i{display:inline-block;width:26px;height:0;border-top:2px solid;vertical-align:middle;margin-right:6px}
+.status{max-width:1920px;margin:0 auto;padding:0 24px 12px;display:flex;align-items:center;gap:14px;min-height:44px}
+.status p{margin:0;font-size:15px;line-height:21px;color:#3D4A5C;flex:1}
+.status p b{color:#15325C}
+.status p em{font-style:normal;color:#5A6B80}
+#reset{font:inherit;font-size:14px;padding:8px 16px;min-height:40px;border-radius:8px;border:1px solid #B9C6D6;background:#fff;color:#15325C;cursor:pointer}
+#reset:hover{background:#F4F7FB}
+#reset[hidden]{display:none}
+.wrap{max-width:1920px;margin:0 auto;padding:0 24px 24px}
+.fit{position:relative;width:100%;aspect-ratio:1920/1080;overflow:hidden;border-radius:14px;background:#fff;box-shadow:0 1px 3px rgba(21,50,92,.08)}
+.stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0}
+.band{position:absolute;left:56px;width:1808px;border-radius:14px}
+.tab{position:absolute;left:56px;width:220px;padding:18px 22px;border-radius:14px 0 0 14px;color:#fff;display:flex;flex-direction:column;gap:4px}
+.t1{font-size:13px;line-height:16px;font-weight:700;letter-spacing:.12em}
+.t2{font-size:26px;line-height:30px;font-weight:700;letter-spacing:.04em}
+.t3{font-size:15px;line-height:20px}
+.t4{margin-top:auto;font-size:18px;line-height:22px;font-weight:700}
+.lines{position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:none}
+.ln{stroke-width:calc(var(--w)*1px);stroke-linecap:round;stroke-opacity:.55;transition:stroke-opacity .2s,stroke-width .2s}
+.ln.kp{stroke-opacity:.65}
+.ln.kd{stroke-opacity:1}
+.mission{position:absolute;height:40px;padding:0 18px;border-radius:8px;background:#15325C;color:#fff;display:flex;align-items:center;font-size:15px;line-height:20px}
+.blk{position:absolute;font:inherit;text-align:left;color:#15325C;background:#fff;border:1px solid transparent;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:6px;cursor:pointer;transition:opacity .2s,box-shadow .2s,transform .15s}
+.blk:hover{box-shadow:0 4px 14px rgba(21,50,92,.14);transform:translateY(-1px)}
+.blk:focus-visible{outline:3px solid #15325C;outline-offset:3px}
+.imp{padding:14px 16px}
+.op{border-color:#D3E3CA;gap:8px}
+.op.f{border:2px solid #B85B00}
+.row{display:flex;align-items:center;gap:8px}
+.num{flex:none;display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+.ti{font-size:16px;line-height:21px;font-weight:700;color:#15325C}
+.ti.big{font-size:17px;line-height:22px;margin-top:-6px}
+.tx{font-size:14px;line-height:19px;color:#3D4A5C}
+.op .tx{font-size:13px;line-height:18px}
+.op .tx b{color:#15325C}
+.cap{font-size:13px;font-weight:700;letter-spacing:.1em}
+.van{font-size:14px;line-height:19px;color:#4A5568}
+.naar{margin-top:auto;gap:6px}
+.tag{font-size:12px;line-height:16px;font-weight:700;letter-spacing:.12em}
+.prods{padding-top:8px;border-top:1px solid #E3E8EE;font-size:13px;line-height:17px;color:#5A6B80}
+.foot{margin-top:auto;padding-top:8px;border-top:1px solid #E3E8EE;display:flex;flex-direction:column;gap:6px}
+.foot .row{gap:4px}
+.fl{width:64px;font-size:13px;color:#5A6B80}
+.direct{margin-left:6px;font-size:13px;font-weight:700;color:#B85B00}
+.gap{position:absolute;left:56px;width:220px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:13px;line-height:18px}
+.g1,.g2{display:flex;align-items:center;gap:6px}
+.g1{font-weight:700} .g2{color:#5A6B80}
+.foot2{position:absolute;left:56px;top:1046px;width:1808px;display:flex;justify-content:space-between;gap:24px;font-size:13px;line-height:18px;color:#5A6B80}
+/* selection state */
+.sel .blk{opacity:.22}
+.sel .blk.on{opacity:1}
+.sel .blk.on.imp{box-shadow:0 0 0 3px #B85B00}
+.sel .blk.on.oc{box-shadow:0 0 0 3px #0B5CAD}
+.sel .blk.on.op{box-shadow:0 0 0 3px #2F7A0A}
+.sel .blk.me{opacity:1;box-shadow:0 0 0 4px #15325C,0 8px 24px rgba(21,50,92,.25)!important;transform:translateY(-2px)}
+.sel .ln{stroke-opacity:.06}
+.sel .ln.on{stroke-opacity:.9;stroke-width:calc(var(--w)*1px + 1px)}
+#drawer{position:fixed;top:0;right:0;height:100%;width:min(440px,100vw);background:#fff;box-shadow:-8px 0 32px rgba(21,50,92,.18);transform:translateX(105%);transition:transform .28s ease;display:flex;flex-direction:column;z-index:10}
+#drawer.open{transform:none}
+.dh{padding:20px 22px 16px;border-bottom:1px solid #E3E8EE;display:flex;flex-direction:column;gap:8px}
+.dtop{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.dlayer{font-size:12px;font-weight:700;letter-spacing:.12em;color:#fff;padding:4px 10px;border-radius:999px}
+#dclose{width:44px;height:44px;border-radius:8px;border:1px solid #CFD8E3;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center}
+#dclose:hover{background:#F4F7FB}
+#dtitle{margin:0;font-size:22px;line-height:28px;color:#15325C;outline:none}
+.ddesc{margin:0;font-size:14px;line-height:20px;color:#3D4A5C}
+.db{flex:1;overflow-y:auto;padding:16px 22px 24px;display:flex;flex-direction:column;gap:18px}
+.db h3{margin:0 0 8px;font-size:13px;letter-spacing:.1em;color:#5A6B80}
+.conn{display:block;width:100%;text-align:left;font:inherit;background:#F7F9FC;border:1px solid #E3E8EE;border-radius:10px;padding:12px 14px;margin-bottom:8px;cursor:pointer;color:#15325C}
+.conn:hover{border-color:#B9C6D6;background:#F1F5FA}
+.conn:focus-visible{outline:3px solid #15325C;outline-offset:2px}
+.ch{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+.cn{font-size:15px;line-height:20px;font-weight:700}
+.cw{flex:none;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:#5A6B80}
+.cw i{display:inline-block;width:22px;border-top:solid #5A6B80}
+.cy{font-size:14px;line-height:20px;color:#3D4A5C}
+.dnote{font-size:13px;line-height:18px;color:#5A6B80;border-top:1px solid #E3E8EE;padding-top:12px}
+.further{font-size:14px;line-height:20px;color:#3D4A5C}
+@media (prefers-reduced-motion:reduce){.blk,.ln,#drawer{transition:none}.blk:hover{transform:none}}
+</style>
+</head>
+<body>
+<header class="top">
+<div><div class="kick">RESULTATENKETEN · DIGITALE INTERACTIE VAN DE OVERHEID</div><h1>Van maatschappelijk effect naar concrete bouwstenen</h1></div>
+<div class="legend"><span><i style="border-color:#0B5CAD"></i>outcome draagt bij aan impact</span><span><i style="border-color:#2F7A0A"></i>output maakt outcome mogelijk</span><span>Lijndikte = samenhang: <i style="border-color:#5A6B80;border-top-width:9px;margin-left:6px"></i>sterk <i style="border-color:#5A6B80;border-top-width:4px;margin-left:8px"></i>gemiddeld <i style="border-color:#5A6B80;border-top-width:1px;margin-left:8px"></i>beperkt</span></div>
+</header>
+<div class="status"><p id="st" aria-live="polite">Klik op een blok om te zien met welke blokken in de andere lagen het verbonden is. Nog een keer klikken, klikken op de achtergrond of Esc zet alles terug.</p><button id="reset" type="button" hidden>Toon alles</button></div>
+<main class="wrap"><div class="fit" id="fit"><div class="stage" id="stage">
+<div class="band" style="top:104px;height:184px;background:#FBF1E6"></div>
+<div class="tab" style="top:104px;height:184px;background:#B85B00"><span class="t1">1</span><span class="t2">IMPACT</span><span class="t3">Het maatschappelijke effect</span><span class="t4">Waarom?</span></div>
+<div class="band" style="top:358px;height:188px;background:#E8F0FA"></div>
+<div class="tab" style="top:358px;height:188px;background:#0B5CAD"><span class="t1">2</span><span class="t2">OUTCOME</span><span class="t3">Zeven verschuivingen voor overheden, burgers en bedrijven</span><span class="t4">Wat verandert er?</span></div>
+<div class="band" style="top:618px;height:418px;background:#EAF4E4"></div>
+<div class="tab" style="top:618px;height:418px;background:#2F7A0A"><span class="t1">3</span><span class="t2">OUTPUT</span><span class="t3">Wat de overheid oplevert: voor burger, ondernemer én voor een efficiënte overheid</span><span class="t4">Wat leveren we op?</span></div>
+<svg class="lines" viewBox="0 0 1920 1080" aria-hidden="true"><defs><marker id="head" orient="auto" markerWidth="5" markerHeight="5" refX="2" refY="2" overflow="visible"><path d="M0 0 L4 2 L0 4 Z" fill="#B85B00"/></marker></defs><line class="ln ko" style="--w:4" data-a="O1" data-b="I1" x1="339" y1="370" x2="358" y2="276" stroke="#0B5CAD"/><line class="ln ko" style="--w:9" data-a="O1" data-b="I3" x1="457" y1="370" x2="986" y2="276" stroke="#0B5CAD"/><line class="ln ko" style="--w:9" data-a="O2" data-b="I2" x1="563" y1="370" x2="690" y2="276" stroke="#0B5CAD"/><line class="ln ko" style="--w:4" data-a="O2" data-b="I4" x1="622" y1="370" x2="1384" y2="276" stroke="#0B5CAD"/><line class="ln ko" style="--w:4" data-a="O2" data-b="I5" x1="681" y1="370" x2="1698" y2="276" stroke="#0B5CAD"/><line class="ln ko" style="--w:9" data-a="O3" data-b="I1" x1="787" y1="370" x2="442" y2="276" stroke="#0B5CAD"/><line class="ln ko" style="--w:9" data-a="O3" data-b="I3" x1="905" y1="370" x2="1070" y2="276" stroke="#0B5CAD"/><line class="ln ko" style="--w:4" data-a="O4" data-b="I2" x1="1070" y1="370" x2="790" y2="276" stroke="#0B5CAD"/><line class="ln ko" style="--w:9" data-a="O5" data-b="I1" x1="1294" y1="370" x2="526" y2="276" stroke="#0B5CAD"/><line class="ln ko" style="--w:4" data-a="O6" data-b="I2" x1="1459" y1="370" x2="838" y2="276" stroke="#0B5CAD"/><line class="ln ko" style="--w:4" data-a="O6" data-b="I3" x1="1577" y1="370" x2="1154" y2="276" stroke="#0B5CAD"/><line class="ln ko" style="--w:9" data-a="O7" data-b="I2" x1="1742" y1="370" x2="884" y2="276" stroke="#0B5CAD"/><line class="ln kp" style="--w:9" data-a="PE" data-b="O1" x1="346" y1="630" x2="398" y2="534" stroke="#2F7A0A"/><line class="ln kp" style="--w:1" data-a="PE" data-b="O4" x1="415" y1="630" x2="1070" y2="534" stroke="#2F7A0A"/><line class="ln kp" style="--w:9" data-a="PE" data-b="O6" x1="484" y1="630" x2="1518" y2="534" stroke="#2F7A0A"/><line class="ln kp" style="--w:9" data-a="PF" data-b="O2" x1="622" y1="630" x2="622" y2="534" stroke="#2F7A0A"/><line class="ln kp" style="--w:4" data-a="PA" data-b="O3" x1="870" y1="630" x2="787" y2="534" stroke="#2F7A0A"/><line class="ln kp" style="--w:9" data-a="PA" data-b="O5" x1="1008" y1="630" x2="1235" y2="534" stroke="#2F7A0A"/><line class="ln kp" style="--w:9" data-a="PB" data-b="O3" x1="1132" y1="630" x2="846" y2="534" stroke="#2F7A0A"/><line class="ln kp" style="--w:4" data-a="PB" data-b="O7" x1="1270" y1="630" x2="1683" y2="534" stroke="#2F7A0A"/><line class="ln kp" style="--w:4" data-a="PC" data-b="O5" x1="1394" y1="630" x2="1294" y2="534" stroke="#2F7A0A"/><line class="ln kp" style="--w:9" data-a="PC" data-b="O7" x1="1532" y1="630" x2="1801" y2="534" stroke="#2F7A0A"/><line class="ln kp" style="--w:9" data-a="PD" data-b="O3" x1="1656" y1="630" x2="905" y2="534" stroke="#2F7A0A"/><line class="ln kp" style="--w:4" data-a="PD" data-b="O5" x1="1794" y1="630" x2="1353" y2="534" stroke="#2F7A0A"/></svg>
+<div class="mission" style="left:292px;top:116px;width:1556px"><span><b>Eén slagvaardige overheid die het vertrouwen van burgers en ondernemers verdient</b> — burgers en ondernemers ervaren één dienstbare overheid, ongeacht bij welke instantie zij aankloppen.</span></div>
+<button class="blk imp" data-id="I1" style="left:292px;top:166px;width:300px;height:110px"><span class="row"><span class="num" style="width:24px;height:24px;border-radius:12px;background:#B85B00;font-size:13px">1</span><span class="ti">Ontzorgend</span></span><span class="tx">Een overheid die mensen ontzorgt.</span></button>
+<button class="blk imp" data-id="I2" style="left:606px;top:166px;width:300px;height:110px"><span class="row"><span class="num" style="width:24px;height:24px;border-radius:12px;background:#B85B00;font-size:13px">2</span><span class="ti">Betaalbaar &amp; wendbaar</span></span><span class="tx">Een publieke sector met maximaal maatschappelijk rendement.</span></button>
+<button class="blk imp" data-id="I3" style="left:920px;top:166px;width:300px;height:110px"><span class="row"><span class="num" style="width:24px;height:24px;border-radius:12px;background:#B85B00;font-size:13px">3</span><span class="ti">Inlevend</span></span><span class="tx">Dienstverlening is toegankelijk, begrijpelijk, inzichtelijk en overzichtelijk.</span></button>
+<button class="blk imp" data-id="I4" style="left:1234px;top:166px;width:300px;height:110px"><span class="row"><span class="num" style="width:24px;height:24px;border-radius:12px;background:#B85B00;font-size:13px">4</span><span class="ti">Weerbaar</span></span><span class="tx">Digitale infrastructuur garandeert de continuïteit van vitale overheidsprocessen.</span></button>
+<button class="blk imp" data-id="I5" style="left:1548px;top:166px;width:300px;height:110px"><span class="row"><span class="num" style="width:24px;height:24px;border-radius:12px;background:#B85B00;font-size:13px">5</span><span class="ti">Betrouwbaar</span></span><span class="tx">Grondrechten en identiteit van burgers en bedrijven maximaal beschermd.</span></button>
+<button class="blk oc" data-id="O1" style="left:292px;top:370px;width:212px;height:164px"><span class="row"><span class="num" style="width:24px;height:24px;border-radius:12px;background:#0B5CAD;font-size:13px">1</span><span class="cap" style="color:#5A6B80">VAN</span></span><span class="van">Eenrichtingsverkeer</span><span class="row naar"><svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true" style="fill:none;stroke:#0B5CAD;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M6 1 L6 12 M2 8 L6 12 L10 8"/></svg><span class="cap" style="color:#0B5CAD">NAAR</span></span><span class="ti">Gehoord worden en luisteren</span></button>
+<button class="blk oc" data-id="O2" style="left:516px;top:370px;width:212px;height:164px"><span class="row"><span class="num" style="width:24px;height:24px;border-radius:12px;background:#0B5CAD;font-size:13px">2</span><span class="cap" style="color:#5A6B80">VAN</span></span><span class="van">Iedere overheid voor zich</span><span class="row naar"><svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true" style="fill:none;stroke:#0B5CAD;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M6 1 L6 12 M2 8 L6 12 L10 8"/></svg><span class="cap" style="color:#0B5CAD">NAAR</span></span><span class="ti">Afstemming, kaders &amp; uniformiteit</span></button>
+<button class="blk oc" data-id="O3" style="left:740px;top:370px;width:212px;height:164px"><span class="row"><span class="num" style="width:24px;height:24px;border-radius:12px;background:#0B5CAD;font-size:13px">3</span><span class="cap" style="color:#5A6B80">VAN</span></span><span class="van">Generiek en reactief</span><span class="row naar"><svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true" style="fill:none;stroke:#0B5CAD;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M6 1 L6 12 M2 8 L6 12 L10 8"/></svg><span class="cap" style="color:#0B5CAD">NAAR</span></span><span class="ti">Persoonlijk, inclusief &amp; proactief</span></button>
+<button class="blk oc" data-id="O4" style="left:964px;top:370px;width:212px;height:164px"><span class="row"><span class="num" style="width:24px;height:24px;border-radius:12px;background:#0B5CAD;font-size:13px">4</span><span class="cap" style="color:#5A6B80">VAN</span></span><span class="van">Oude interactiepatronen</span><span class="row naar"><svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true" style="fill:none;stroke:#0B5CAD;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M6 1 L6 12 M2 8 L6 12 L10 8"/></svg><span class="cap" style="color:#0B5CAD">NAAR</span></span><span class="ti">Gezamenlijk innovatief</span></button>
+<button class="blk oc" data-id="O5" style="left:1188px;top:370px;width:212px;height:164px"><span class="row"><span class="num" style="width:24px;height:24px;border-radius:12px;background:#0B5CAD;font-size:13px">5</span><span class="cap" style="color:#5A6B80">VAN</span></span><span class="van">Versnipperd</span><span class="row naar"><svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true" style="fill:none;stroke:#0B5CAD;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M6 1 L6 12 M2 8 L6 12 L10 8"/></svg><span class="cap" style="color:#0B5CAD">NAAR</span></span><span class="ti">Samenhangend</span></button>
+<button class="blk oc" data-id="O6" style="left:1412px;top:370px;width:212px;height:164px"><span class="row"><span class="num" style="width:24px;height:24px;border-radius:12px;background:#0B5CAD;font-size:13px">6</span><span class="cap" style="color:#5A6B80">VAN</span></span><span class="van">Blind brandjes blussen</span><span class="row naar"><svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true" style="fill:none;stroke:#0B5CAD;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M6 1 L6 12 M2 8 L6 12 L10 8"/></svg><span class="cap" style="color:#0B5CAD">NAAR</span></span><span class="ti">Datagedreven werken</span></button>
+<button class="blk oc" data-id="O7" style="left:1636px;top:370px;width:212px;height:164px"><span class="row"><span class="num" style="width:24px;height:24px;border-radius:12px;background:#0B5CAD;font-size:13px">7</span><span class="cap" style="color:#5A6B80">VAN</span></span><span class="van">Reactief, digitalisering als bijzaak</span><span class="row naar"><svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true" style="fill:none;stroke:#0B5CAD;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M6 1 L6 12 M2 8 L6 12 L10 8"/></svg><span class="cap" style="color:#0B5CAD">NAAR</span></span><span class="ti">Digitalisering in je kernproces</span></button>
+<button class="blk op" data-id="PE" style="left:292px;top:630px;width:246px;height:394px"><span class="tag" style="color:#15325C">OVERHEIDSBREED</span><span class="ti big">Sturen, meten &amp; verbeteren</span><span class="tx"><b>Burger &amp; ondernemer:</b> Signalen en feedback leiden aantoonbaar tot verbetering.</span><span class="tx"><b>Overheid:</b> Sturen op data: gericht verbeteren en investeren in plaats van brandjes blussen.</span><span class="prods">Klantbelevingsmeting · Signalen- &amp; feedbackstandaard · Aanpak Levensgebeurtenissen · Ketenherontwerp-orgaan*</span><span class="foot"><span class="row"><span class="fl">Outcome</span><span class="num" style="width:20px;height:20px;border-radius:10px;background:#0B5CAD;font-size:12px">1</span><span class="num" style="width:20px;height:20px;border-radius:10px;background:#0B5CAD;font-size:12px">4</span><span class="num" style="width:20px;height:20px;border-radius:10px;background:#0B5CAD;font-size:12px">6</span></span><span class="row"><span class="fl">Impact</span><span class="num" style="width:20px;height:20px;border-radius:10px;background:#B85B00;font-size:12px">1</span><span class="num" style="width:20px;height:20px;border-radius:10px;background:#B85B00;font-size:12px">2</span><span class="num" style="width:20px;height:20px;border-radius:10px;background:#B85B00;font-size:12px">3</span></span></span></button>
+<button class="blk op" data-id="PF" style="left:554px;top:630px;width:246px;height:394px"><span class="tag" style="color:#15325C">OVERHEIDSBREED</span><span class="ti big">Generieke infrastructuur</span><span class="tx"><b>Wendbaar:</b> één centrale voorziening aanpassen is makkelijker dan honderden decentrale.</span><span class="tx"><b>Betaalbaar:</b> één centrale voorziening is goedkoper en makkelijker te onderhouden.</span><span class="prods">Herbouw Berichtenbox (FBS) · NL Design System · Standaard bouwblokken</span><span class="foot"><span class="row"><span class="fl">Outcome</span><span class="num" style="width:20px;height:20px;border-radius:10px;background:#0B5CAD;font-size:12px">2</span></span><span class="row"><span class="fl">Impact</span><span class="num" style="width:20px;height:20px;border-radius:10px;background:#B85B00;font-size:12px">2</span><span class="num" style="width:20px;height:20px;border-radius:10px;background:#B85B00;font-size:12px">4</span><span class="num" style="width:20px;height:20px;border-radius:10px;background:#B85B00;font-size:12px">5</span></span></span></button>
+<button class="blk op" data-id="PA" style="left:816px;top:630px;width:246px;height:394px"><span class="tag" style="color:#2F7A0A">KLANTREIS 1</span><span class="ti big">Oriënteren &amp; vinden</span><span class="tx"><b>Burger &amp; ondernemer:</b> informatie vinden vanuit je situatie, alles op één herkenbare plek.</span><span class="tx"><b>Overheid:</b> minder zoekvragen en doorverwijzingen.</span><span class="prods">Checklist levensgebeurtenissen · Regelhulpen · Digitale Assistent (AI) · Nieuwe-wetten-app · PDC (SC/SDG + UPL) · Higherlevel · Overheid.nl · MijnOverheid · MijnOverheid Zakelijk · Ondernemers.overheid.nl</span><span class="foot"><span class="row"><span class="fl">Outcome</span><span class="num" style="width:20px;height:20px;border-radius:10px;background:#0B5CAD;font-size:12px">3</span><span class="num" style="width:20px;height:20px;border-radius:10px;background:#0B5CAD;font-size:12px">5</span></span><span class="row"><span class="fl">Impact</span><span class="num" style="width:20px;height:20px;border-radius:10px;background:#B85B00;font-size:12px">1</span><span class="num" style="width:20px;height:20px;border-radius:10px;background:#B85B00;font-size:12px">3</span></span></span></button>
+<button class="blk op" data-id="PB" style="left:1078px;top:630px;width:246px;height:394px"><span class="tag" style="color:#2F7A0A">KLANTREIS 2</span><span class="ti big">Op de hoogte blijven</span><span class="tx"><b>Burger &amp; ondernemer:</b> tijdig en proactief geïnformeerd, ook zonder lopende zaak.</span><span class="tx"><b>Overheid:</b> minder gemiste termijnen, herstelwerk en aanmaningen.</span><span class="prods">Notificatieservice · Berichtenservice · Berichtenbox / FBS</span><span class="foot"><span class="row"><span class="fl">Outcome</span><span class="num" style="width:20px;height:20px;border-radius:10px;background:#0B5CAD;font-size:12px">3</span><span class="num" style="width:20px;height:20px;border-radius:10px;background:#0B5CAD;font-size:12px">7</span></span><span class="row"><span class="fl">Impact</span><span class="num" style="width:20px;height:20px;border-radius:10px;background:#B85B00;font-size:12px">1</span><span class="num" style="width:20px;height:20px;border-radius:10px;background:#B85B00;font-size:12px">2</span><span class="num" style="width:20px;height:20px;border-radius:10px;background:#B85B00;font-size:12px">3</span></span></span></button>
+<button class="blk op" data-id="PC" style="left:1340px;top:630px;width:246px;height:394px"><span class="tag" style="color:#2F7A0A">KLANTREIS 3</span><span class="ti big">Regelen &amp; regie</span><span class="tx"><b>Burger &amp; ondernemer:</b> direct handelen bij lopende zaken, met overzicht én regie op je gegevens.</span><span class="tx"><b>Overheid:</b> minder telefoontjes, papier en handmatige afhandeling.</span><span class="prods">MijnZaken · MijnTaken · Track &amp; Trace · Mijn Betaaloverzicht (MBO) · Mijn Profiel · Mijn gegevens</span><span class="foot"><span class="row"><span class="fl">Outcome</span><span class="num" style="width:20px;height:20px;border-radius:10px;background:#0B5CAD;font-size:12px">5</span><span class="num" style="width:20px;height:20px;border-radius:10px;background:#0B5CAD;font-size:12px">7</span></span><span class="row"><span class="fl">Impact</span><span class="num" style="width:20px;height:20px;border-radius:10px;background:#B85B00;font-size:12px">1</span><span class="num" style="width:20px;height:20px;border-radius:10px;background:#B85B00;font-size:12px">2</span></span></span></button>
+<button class="blk op" data-id="PD" style="left:1602px;top:630px;width:246px;height:394px"><span class="tag" style="color:#2F7A0A">KLANTREIS 4</span><span class="ti big">Hulp &amp; contact</span><span class="tx"><b>Burger &amp; ondernemer:</b> persoonlijk geholpen waar nodig, via elk kanaal.</span><span class="tx"><b>Overheid:</b> één loket in plaats van van het kastje naar de muur.</span><span class="prods">IDO-assistentie · Integrale loketfunctie · Fysieke loketten · KVK OndernemersPlein · Klantcontact</span><span class="foot"><span class="row"><span class="fl">Outcome</span><span class="num" style="width:20px;height:20px;border-radius:10px;background:#0B5CAD;font-size:12px">3</span><span class="num" style="width:20px;height:20px;border-radius:10px;background:#0B5CAD;font-size:12px">5</span></span><span class="row"><span class="fl">Impact</span><span class="num" style="width:20px;height:20px;border-radius:10px;background:#B85B00;font-size:12px">1</span><span class="num" style="width:20px;height:20px;border-radius:10px;background:#B85B00;font-size:12px">3</span></span></span></button>
+<div class="gap" style="top:300px"><span class="g1"><svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true" style="fill:none;stroke:#15325C;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M6 13 L6 2 M2 6 L6 2 L10 6"/></svg>draagt bij aan</span><span class="g2"><svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true" style="fill:none;stroke:#5A6B80;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M6 1 L6 12 M2 8 L6 12 L10 8"/></svg>geeft richting</span></div>
+<div class="gap" style="top:558px"><span class="g1"><svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true" style="fill:none;stroke:#15325C;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M6 13 L6 2 M2 6 L6 2 L10 6"/></svg>maakt mogelijk</span><span class="g2"><svg width="12" height="14" viewBox="0 0 12 14" aria-hidden="true" style="fill:none;stroke:#5A6B80;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M6 1 L6 12 M2 8 L6 12 L10 8"/></svg>geeft richting</span></div>
+<div class="foot2"><span>Bron: Slagvaardige Overheid · NDS prioriteit 4 ‘Burger &amp; ondernemer centraal’ · Beleidsvisie overheidsbrede online dienstverlening · Meerjarenvisie DO 2025–2030 · ADO-herziening</span><span>* nog te ontwikkelen · lijnen: voorstel belangrijkste bijdragen</span></div>
+</div></div></main>
+<aside id="drawer" role="dialog" aria-modal="false" aria-labelledby="dtitle" aria-hidden="true">
+<div class="dh"><div class="dtop"><span class="dlayer" id="dlayer"></span><button id="dclose" type="button" aria-label="Sluit toelichting"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" style="fill:none;stroke:#15325C;stroke-width:2;stroke-linecap:round"><path d="M3 3 L13 13 M13 3 L3 13"/></svg></button></div>
+<h2 id="dtitle" tabindex="-1"></h2><p class="ddesc" id="ddesc"></p></div>
+<div class="db" id="dbody"></div>
+</aside>
+<script>
+const EDGES=[{"a": "O1", "b": "I1", "w": "gemiddeld"}, {"a": "O1", "b": "I3", "w": "sterk"}, {"a": "O2", "b": "I2", "w": "sterk"}, {"a": "O2", "b": "I4", "w": "gemiddeld"}, {"a": "O2", "b": "I5", "w": "gemiddeld"}, {"a": "O3", "b": "I1", "w": "sterk"}, {"a": "O3", "b": "I3", "w": "sterk"}, {"a": "O4", "b": "I2", "w": "gemiddeld"}, {"a": "O5", "b": "I1", "w": "sterk"}, {"a": "O6", "b": "I2", "w": "gemiddeld"}, {"a": "O6", "b": "I3", "w": "gemiddeld"}, {"a": "O7", "b": "I2", "w": "sterk"}, {"a": "PE", "b": "O1", "w": "sterk"}, {"a": "PE", "b": "O4", "w": "beperkt"}, {"a": "PE", "b": "O6", "w": "sterk"}, {"a": "PF", "b": "O2", "w": "sterk"}, {"a": "PA", "b": "O3", "w": "gemiddeld"}, {"a": "PA", "b": "O5", "w": "sterk"}, {"a": "PB", "b": "O3", "w": "sterk"}, {"a": "PB", "b": "O7", "w": "gemiddeld"}, {"a": "PC", "b": "O5", "w": "gemiddeld"}, {"a": "PC", "b": "O7", "w": "sterk"}, {"a": "PD", "b": "O3", "w": "sterk"}, {"a": "PD", "b": "O5", "w": "gemiddeld"}], NAMES={"I1": "Impact 1 · Ontzorgend", "I2": "Impact 2 · Betaalbaar & wendbaar", "I3": "Impact 3 · Inlevend", "I4": "Impact 4 · Weerbaar", "I5": "Impact 5 · Betrouwbaar", "O1": "Outcome 1 · Gehoord worden en luisteren", "O2": "Outcome 2 · Afstemming, kaders & uniformiteit", "O3": "Outcome 3 · Persoonlijk, inclusief & proactief", "O4": "Outcome 4 · Gezamenlijk innovatief", "O5": "Outcome 5 · Samenhangend", "O6": "Outcome 6 · Datagedreven werken", "O7": "Outcome 7 · Digitalisering in je kernproces", "PE": "Output · Sturen, meten & verbeteren", "PF": "Output · Generieke infrastructuur", "PA": "Output · Oriënteren & vinden", "PB": "Output · Op de hoogte blijven", "PC": "Output · Regelen & regie", "PD": "Output · Hulp & contact"}, WHY={"O1|I1": "Wie gehoord wordt, hoeft minder vaak opnieuw aan te kloppen. Signalen en feedback halen knelpunten weg die mensen anders zelf moeten oplossen.", "O1|I3": "Luisteren is de kern van een overheid die zich inleeft. Feedback laat zien waar dienstverlening onbegrijpelijk of ontoegankelijk is, en leidt aantoonbaar tot verbetering.", "O2|I2": "Gezamenlijke kaders, standaarden en instrumenten voorkomen dat elke organisatie hetzelfde wiel uitvindt. Dat bespaart kosten en maakt samen bijsturen makkelijker.", "O2|I4": "Uniforme standaarden en gedeelde voorzieningen zijn beter te beveiligen en te beheren dan een lappendeken. Dat ondersteunt de continuïteit van vitale processen.", "O2|I5": "Gedeelde kaders borgen dat grondrechten, privacy en identiteit overal op hetzelfde niveau beschermd worden, ongeacht de instantie.", "O3|I1": "Proactieve dienstverlening rond levensgebeurtenissen neemt mensen werk uit handen: de overheid komt zelf in actie in plaats van te wachten op een aanvraag.", "O3|I3": "Persoonlijke en inclusieve dienstverlening sluit aan op de situatie van mensen, ook in Caribisch Nederland. Dat is precies wat inleven betekent.", "O4|I2": "Samen experimenteren en AI verantwoord toepassen binnen bestaande kaders maakt de overheid wendbaar en voorkomt dubbele investeringen.", "O5|I1": "Geïntegreerde voorzieningen en samenwerking langs de keten betekenen dat mensen niet zelf alle loketten hoeven af te gaan.", "O6|I2": "Wie meet wat werkt, kan gerichter investeren en is minder geld kwijt aan brandjes blussen.", "O6|I3": "Uniform meten hoe burgers en ondernemers de dienstverlening beleven, maakt zichtbaar waar die beter moet aansluiten.", "O7|I2": "Digitalisering van wet tot uitvoering voorkomt handwerk en herstelwerk achteraf. Daar zit de grootste efficiencywinst.", "PE|O1": "De signalen- en feedbackstandaard en de klantbelevingsmeting zijn de instrumenten waarmee de overheid gaat luisteren.", "PE|O4": "Het ketenherontwerp-orgaan (nog te ontwikkelen) kan gezamenlijke vernieuwing aanjagen, maar dat is niet de hoofdfunctie van dit blok.", "PE|O6": "Meten en verbeteren ís datagedreven werken: uniform meten en daarop sturen.", "PF|O2": "Gedeelde bouwstenen zoals NL Design System, standaard bouwblokken en de Berichtenbox maken uniformiteit concreet. Eén centrale voorziening aanpassen is makkelijker dan honderden decentrale (wendbaar) en is goedkoper en eenvoudiger te onderhouden (betaalbaar).", "PA|O3": "Checklists en regelhulpen vanuit levensgebeurtenissen maken informatie persoonlijker, maar blijven vooral een aanbod waar mensen zelf naar zoeken.", "PA|O5": "Eén herkenbare ingang (Overheid.nl, MijnOverheid, Ondernemers.overheid.nl) bundelt wat nu over vele sites versnipperd is.", "PB|O3": "Notificaties en berichten maken de overheid proactief: mensen horen op tijd dat er iets speelt of moet, ook zonder lopende zaak.", "PB|O7": "Berichten met actieknoppen, deadlines en status zijn een direct resultaat van digitalisering in het kernproces.", "PC|O5": "MijnZaken en MijnTaken tonen lopende zaken van verschillende organisaties op één plek.", "PC|O7": "Direct handelen bij lopende zaken, met track & trace en betaaloverzicht, kan alleen als het kernproces digitaal is ingericht.", "PD|O3": "Persoonlijke hulp via elk kanaal zorgt dat ook wie digitaal niet meekomt goed geholpen wordt.", "PD|O5": "Een integrale loketfunctie voorkomt dat mensen van het kastje naar de muur worden gestuurd."}, DESC={"I1": "Een overheid die mensen ontzorgt.", "I2": "Een betaalbare en wendbare publieke sector met maximaal maatschappelijk rendement.", "I3": "Mensen ervaren dat de overheid zich inleeft in hun situatie. Dienstverlening is toegankelijk, begrijpelijk, inzichtelijk en overzichtelijk.", "I4": "Een weerbare digitale infrastructuur die de continuïteit van de vitale overheidsprocessen garandeert.", "I5": "Een betrouwbare digitale overheid waarin de grondrechten en identiteit van burgers en bedrijven maximaal zijn beschermd.", "O1": "Van eenrichtingsverkeer naar gehoord worden en luisteren. Signalen en feedback leiden aantoonbaar tot verbetering; mensen en overheden kunnen op elkaar reageren.", "O2": "Van iedere overheid voor zich naar afstemming, kaders en uniformiteit. Overheidsbrede kaders, standaarden en instrumenten worden toegepast én samen doorontwikkeld.", "O3": "Van generiek en reactief naar persoonlijk, inclusief en proactief. Dienstverlening volgt levensgebeurtenissen, is proactief en dichtbij, ook in Caribisch Nederland.", "O4": "Van oude interactiepatronen naar gezamenlijk innovatief. Nieuwe technologie en AI verantwoord toepassen, door samen te experimenteren binnen bestaande kaders.", "O5": "Van versnipperd naar samenhangend. Geïntegreerde voorzieningen en samenhangende diensten vanuit de leefwereld van mensen; samenwerking door overheden langs de keten.", "O6": "Van blind brandjes blussen naar datagedreven werken. Uniform meten hoe burgers en ondernemers de dienstverlening beleven, en daarop sturen.", "O7": "Van reactief, met digitalisering als bijzaak, naar handelingsperspectief en digitalisering in het kernproces. Eén duidelijk proces van wet naar digitale werking; berichten met actieknoppen, deadlines en status.", "PE": "Overheidsbreed: signalen ophalen, meten en de dienstverlening continu verbeteren. Bouwstenen: Klantbelevingsmeting, Signalen- & feedbackstandaard, Aanpak Levensgebeurtenissen, Ketenherontwerp-orgaan (nog te ontwikkelen).", "PF": "Overheidsbreed: gedeelde voorzieningen in plaats van honderden decentrale. Wendbaar: één centrale voorziening aanpassen is makkelijker. Betaalbaar: één centrale voorziening is goedkoper en makkelijker te onderhouden. Bouwstenen: Herbouw Berichtenbox (FBS), NL Design System, Standaard bouwblokken.", "PA": "Klantreisfase 1. Informatie vinden vanuit je situatie, alles op één herkenbare plek. Bouwstenen: Checklist levensgebeurtenissen, Regelhulpen, Digitale Assistent (AI), Nieuwe-wetten-app, PDC, Higherlevel, Overheid.nl, MijnOverheid (Zakelijk), Ondernemers.overheid.nl.", "PB": "Klantreisfase 2. Tijdig en proactief geïnformeerd worden, ook zonder lopende zaak. Bouwstenen: Notificatieservice, Berichtenservice, Berichtenbox / FBS.", "PC": "Klantreisfase 3. Direct handelen bij lopende zaken, met overzicht én regie op je gegevens. Bouwstenen: MijnZaken, MijnTaken, Track & Trace, Mijn Betaaloverzicht, Mijn Profiel, Mijn gegevens.", "PD": "Klantreisfase 4. Persoonlijk geholpen waar nodig, door een mens die meedenkt én namens de overheid kan handelen, via elk kanaal. Bouwstenen: IDO-assistentie, Integrale loketfunctie, Fysieke loketten, KVK OndernemersPlein, Klantcontact."};
+const stage=document.getElementById('stage'), fit=document.getElementById('fit');
+function scale(){stage.style.transform='scale('+(fit.clientWidth/1920)+')';}
+new ResizeObserver(scale).observe(fit); scale();
+const blocks=[...document.querySelectorAll('.blk')], lines=[...document.querySelectorAll('.ln')];
+const st=document.getElementById('st'), reset=document.getElementById('reset');
+const HINT=st.innerHTML; let cur=null;
+function walk(start){
+  const nodes=new Set([start]), es=new Set();
+  // upward: follow a->b ; downward: follow b->a
+  let q=[start];
+  while(q.length){const n=q.shift(); EDGES.forEach((e,i)=>{if(e.a===n){es.add(i); if(!nodes.has(e.b)){nodes.add(e.b);q.push(e.b);}}});}
+  q=[start]; const down=new Set([start]);
+  while(q.length){const n=q.shift(); EDGES.forEach((e,i)=>{if(e.b===n){es.add(i); if(!down.has(e.a)){down.add(e.a);nodes.add(e.a);q.push(e.a);}}});}
+  return {nodes,es};
+}
+let DIR={};
+function label(ids,prefix){return ids.filter(i=>i[0]===prefix).sort().map(i=>NAMES[i].replace(/^[^·]*· /,'')+(DIR[i]?' <em>('+DIR[i]+')</em>':'')).join(', ');}
+function select(id,force){
+  if((cur===id&&!force)||!id){cur=null;closeDrawer();stage.classList.remove('sel');blocks.forEach(b=>{b.classList.remove('on','me');b.setAttribute('aria-pressed','false')});lines.forEach(l=>l.classList.remove('on'));st.innerHTML=HINT;reset.hidden=true;return;}
+  cur=id; const {nodes,es}=walk(id); DIR={}; EDGES.forEach(e=>{if(e.a===id)DIR[e.b]=e.w; if(e.b===id)DIR[e.a]=e.w;});
+  stage.classList.add('sel');
+  blocks.forEach(b=>{const on=nodes.has(b.dataset.id);b.classList.toggle('on',on);b.classList.toggle('me',b.dataset.id===id);b.setAttribute('aria-pressed',String(b.dataset.id===id));});
+  lines.forEach((l,i)=>l.classList.toggle('on',es.has(i)));
+  const ids=[...nodes].filter(n=>n!==id), parts=[];
+  const I=label(ids,'I'),O=label(ids,'O'),P=label(ids,'P');
+  if(I)parts.push('<b>Impact:</b> '+I); if(O)parts.push('<b>Outcome:</b> '+O); if(P)parts.push('<b>Output:</b> '+P);
+  let extra='';
+  st.innerHTML='<b>'+NAMES[id]+'</b> — verbonden met '+parts.join(' &nbsp;|&nbsp; ')+extra;
+  reset.hidden=false;
+  openDrawer(id,nodes);
+}
+const drawer=document.getElementById('drawer'), dbody=document.getElementById('dbody');
+const LAYER={I:['IMPACT','#B85B00'],O:['OUTCOME','#0B5CAD'],P:['OUTPUT','#2F7A0A']};
+const PXW={sterk:6,gemiddeld:3,beperkt:1};
+let opener=null;
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;');}
+function item(other,w,why){return '<button class="conn" type="button" data-go="'+other+'"><span class="ch"><span class="cn">'+esc(NAMES[other])+'</span><span class="cw"><i style="border-top-width:'+PXW[w]+'px"></i>'+w+'</span></span><span class="cy">'+esc(why||'')+'</span></button>';}
+function openDrawer(id,nodes){
+  const L=LAYER[id[0]];
+  const dl=document.getElementById('dlayer'); dl.textContent=L[0]; dl.style.background=L[1];
+  document.getElementById('dtitle').textContent=NAMES[id].replace(/^[^·]*· /,'');
+  document.getElementById('ddesc').textContent=DESC[id]||'';
+  const upE=EDGES.filter(e=>e.a===id), dnE=EDGES.filter(e=>e.b===id);
+  const ord={sterk:0,gemiddeld:1,beperkt:2};
+  upE.sort((x,y)=>ord[x.w]-ord[y.w]); dnE.sort((x,y)=>ord[x.w]-ord[y.w]);
+  let h='';
+  if(upE.length){h+='<section><h3>'+(id[0]==='P'?'MAAKT MOGELIJK':'DRAAGT BIJ AAN')+'</h3>'+upE.map(e=>item(e.b,e.w,WHY[e.a+'|'+e.b])).join('')+'</section>';}
+  if(dnE.length){h+='<section><h3>'+(id[0]==='I'?'WORDT GEVOED DOOR':'WORDT MOGELIJK GEMAAKT DOOR')+'</h3>'+dnE.map(e=>item(e.a,e.w,WHY[e.a+'|'+e.b])).join('')+'</section>';}
+  const direct=new Set([...upE.map(e=>e.b),...dnE.map(e=>e.a),id]);
+  const fur=[...nodes].filter(n=>!direct.has(n)).sort();
+  if(fur.length){h+='<section><h3>VERDER IN DE KETEN</h3><p class="further">'+fur.map(n=>esc(NAMES[n])).join('<br>')+'</p></section>';}
+  h+='<p class="dnote">Toelichting en sterkte van de koppelingen zijn een voorstel. Klik op een koppeling om naar dat blok te gaan.</p>';
+  dbody.innerHTML=h; dbody.scrollTop=0;
+  dbody.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>{select(b.dataset.go,true);}));
+  drawer.classList.add('open'); drawer.setAttribute('aria-hidden','false');
+  document.getElementById('dtitle').focus({preventScroll:true});
+}
+function closeDrawer(){drawer.classList.remove('open');drawer.setAttribute('aria-hidden','true');}
+document.getElementById('dclose').addEventListener('click',()=>{const o=opener;select(null);if(o)o.focus();});
+blocks.forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();opener=b;select(b.dataset.id);}));
+stage.addEventListener('click',()=>select(null));
+reset.addEventListener('click',()=>select(null));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')select(null);});
+</script>
+</body>
+</html>
